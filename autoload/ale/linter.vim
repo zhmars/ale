@@ -4,6 +4,7 @@ call ale#Set('wrap_command_as_one_argument', 0)
 "   Retrieves linters as requested by the engine, loading them if needed.
 
 let s:linters = {}
+let s:has_searched_runtimepath_map = {}
 
 " Default filetype aliases.
 " The user defined aliases will be merged with this Dictionary.
@@ -39,6 +40,7 @@ let s:default_ale_linters = {
 " Testing/debugging helper to unload all linters.
 function! ale#linter#Reset() abort
     let s:linters = {}
+    let s:has_searched_runtimepath_map = {}
 endfunction
 
 function! s:IsCallback(value) abort
@@ -246,18 +248,14 @@ function! ale#linter#GetAll(filetypes) abort
     let l:combined_linters = []
 
     for l:filetype in a:filetypes
-        " Load linter defintions from files if we haven't loaded them yet.
-        if !has_key(s:linters, l:filetype)
+        " Search runtimepath for ale_linters files if we haven't yet.
+        if !has_key(s:has_searched_runtimepath_map, l:filetype)
             execute 'silent! runtime! ale_linters/' . l:filetype . '/*.vim'
 
-            " Always set an empty List for the loaded linters if we don't find
-            " any. This will prevent us from executing the runtime command
-            " many times, redundantly.
-            if !has_key(s:linters, l:filetype)
-                let s:linters[l:filetype] = []
-            endif
+            let s:has_searched_runtimepath_map[l:filetype] = 1
         endif
 
+        " Add on the linters we could have defined at any time.
         call extend(l:combined_linters, get(s:linters, l:filetype, []))
     endfor
 
