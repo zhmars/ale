@@ -14,7 +14,7 @@ let g:loaded_ale_dont_use_this_in_other_plugins_please = 1
 
 " A flag for detecting if the required features are set.
 if has('nvim')
-    let s:has_features = has('timers')
+    let s:has_features = has('timers') && has('lambda')
 else
     " Check if Job and Channel functions are available, instead of the
     " features. This works better on old MacVim versions.
@@ -30,12 +30,6 @@ if !s:has_features
 
     " Stop here, as it won't work.
     finish
-endif
-
-" remove in 2.0
-if has('nvim') && !has('nvim-0.2.0') && !get(g:, 'ale_use_deprecated_neovim')
-    execute 'echom ''ALE support for NeoVim versions below 0.2.0 is deprecated.'''
-    execute 'echom ''Use `let g:ale_use_deprecated_neovim = 1` to silence this warning for now.'''
 endif
 
 " Set this flag so that other plugins can use it, like airline.
@@ -231,25 +225,3 @@ augroup ALECleanupGroup
     autocmd BufDelete * call ale#engine#Cleanup(str2nr(expand('<abuf>')))
     autocmd QuitPre * call ale#events#QuitEvent(str2nr(expand('<abuf>')))
 augroup END
-
-" Backwards Compatibility
-
-" remove in 2.0
-function! ALELint(delay) abort
-    if !get(g:, 'ale_deprecation_ale_lint', 0)
-        execute 'echom ''ALELint() is deprecated, use ale#Queue() instead.'''
-        let g:ale_deprecation_ale_lint = 1
-    endif
-
-    call ale#Queue(a:delay)
-endfunction
-
-" remove in 2.0
-function! ALEGetStatusLine() abort
-    if !get(g:, 'ale_deprecation_ale_get_status_line', 0)
-        execute 'echom ''ALEGetStatusLine() is deprecated.'''
-        let g:ale_deprecation_ale_get_status_line = 1
-    endif
-
-    return ale#statusline#Status()
-endfunction
