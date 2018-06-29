@@ -6,6 +6,6 @@ call ale#linter#Define('markdown', {
     \ 'executable': 'markdownlint',
     \ 'lint_file': 1,
     \ 'output_stream': 'both',
-    \ 'command': 'markdownlint %s',
+    \ 'command_callback': 'ale#handlers#markdownlint#GetCommand',
     \ 'callback': 'ale#handlers#markdownlint#Handle'
 \ })

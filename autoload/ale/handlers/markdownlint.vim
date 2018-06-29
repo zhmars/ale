@@ -1,6 +1,15 @@
 " Author: Ty-Lucas Kelley <tylucaskelley@gmail.com>
 " Description: Adds support for markdownlint
 
+call ale#Set('markdown_markdownlint_options', '')
+
+function! ale#handlers#markdownlint#GetCommand(buffer) abort
+  let l:options = ale#Var(a:buffer, 'markdown_markdownlint_options')
+  return 'markdownlint'
+    \ . (!empty(l:options) ? ' ' . l:options : '')
+    \ . ' %s'
+endfunction
+
 function! ale#handlers#markdownlint#Handle(buffer, lines) abort
     let l:pattern=': \(\d*\): \(MD\d\{3}\)\(\/\)\([A-Za-z0-9-]\+\)\(.*\)$'
     let l:output=[]
